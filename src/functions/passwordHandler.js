@@ -1,17 +1,16 @@
 import axios from "axios";
-const auth = '{"username":"admin"}';
 
-export function get() {
+export async function register(username, password) {
   let config = {
-    method: "get",
-    url: "https://139.162.128.79:5005/passwords",
+    method: "post",
+    url: "https://139.162.128.79:5005/register",
     headers: {
       "Content-Type": "application/json",
     },
-    data: auth,
+    data: JSON.stringify({username:username, masterPassword:password }),
   };
 
-  axios
+  await axios
     .request(config)
     .then((response) => {
       return JSON.stringify(response.data);

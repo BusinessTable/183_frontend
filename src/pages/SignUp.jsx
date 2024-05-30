@@ -3,17 +3,15 @@ import { Avatar, Button, CssBaseline, TextField, Grid, Box, Typography, Containe
 import { Link } from "react-router-dom";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { register } from "../functions/passwordHandler";
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get("email"),
-      masterPassword: data.get("password"),
-    });
+    console.log(await register(data.get("userName"), data.get("masterPassword")))
   };
 
   return (
@@ -37,16 +35,16 @@ export default function SignUp() {
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <TextField required fullWidth id="email" label="Email Address" name="email" autoComplete="email" />
+                <TextField required fullWidth id="userName" label="User Name" name="userName" autoComplete="username" />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
+                  name="masterPassword"
+                  label="masterPassword"
+                  type="masterPassword"
+                  id="masterPassword"
                   autoComplete="new-password"
                 />
               </Grid>

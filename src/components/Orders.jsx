@@ -4,18 +4,15 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { get } from "../functions/passwordHandler";
 
 // Generate Order Data
 
-
-const rows = get();
-
-function preventDefault(event) {
-  event.preventDefault();
-}
-
 export default function Orders() {
+  let rows = [];
+  React.useEffect(() => {
+    
+  }, []);
+
   return (
     <React.Fragment>
       <Table size="small">
@@ -29,7 +26,7 @@ export default function Orders() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, idx) => (
+          {rows.forEach((row, idx) => (
             <TableRow key={idx}>
               <TableCell>{row.type}</TableCell>
               <TableCell>{row.username}</TableCell>
