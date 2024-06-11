@@ -1,12 +1,36 @@
-import axios from "axios";
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
+
+let url = 'https://localhost:5005'
 
 export async function register(username, password) {
   let config = {
-    method: "post",
+    method: 'post',
     maxBodyLength: Infinity,
-    url: "http://139.162.128.79:5005/register",
+    url: url+'/register',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
+    },
+    data: JSON.stringify({ username: username, masterPassword: password }),
+  };
+
+  return await axios
+    .request(config)
+    .then((response) => {
+      return JSON.stringify(response.data);
+    })
+    .catch((error) => {
+      return error;
+    });
+}
+
+export async function login(username, password) {
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: url+'/login',
+    headers: {
+      'Content-Type': 'application/json',
     },
     data: JSON.stringify({ username: username, masterPassword: password }),
   };
