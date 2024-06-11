@@ -21,3 +21,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 im front end konnten wir heute leider nicht viel machen, da hauptsächlich die verbindung zum backend fehlt.
 
 sobald wir keine probleme, mit dem backend haben, fählt praktisch nur noch die authentisierung der routes und die visualisierung der daten. 
+
+## Reflexion 06.06.2024
+
+Wir konnten die Fehler des Backends lösen. Jetzt fehlt nur noch, die Endpoints zu verbinden.
