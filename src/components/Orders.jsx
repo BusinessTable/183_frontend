@@ -15,7 +15,6 @@ export default function Orders() {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>type</TableCell>
             <TableCell>username</TableCell>
             <TableCell>pwd</TableCell>
             <TableCell>url</TableCell>
@@ -25,7 +24,6 @@ export default function Orders() {
         <TableBody>
           {rows.forEach((row, idx) => (
             <TableRow key={idx}>
-              <TableCell>{row.type}</TableCell>
               <TableCell>{row.username}</TableCell>
               <TableCell>{row.pwd}</TableCell>
               <TableCell>{row.url}</TableCell>

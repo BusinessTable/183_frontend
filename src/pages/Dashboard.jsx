@@ -11,8 +11,7 @@ import Paper from "@mui/material/Paper";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Orders from "../components/Orders";
-import AddPassword from "../components/AddPassword";
-import useAuth from "../hooks/useAuth";
+import AddPassword from "../components/AddPassword";  // Import the new AddPassword component
 
 const drawerWidth = 240;
 
@@ -42,9 +41,13 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== "open" 
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
-  const { logout } = useAuth();
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  const handleLogout = () => {
+    // Add your logout logic here
+    console.log("Logout clicked");
   };
 
   return (
@@ -62,7 +65,7 @@ export default function Dashboard() {
           <IconButton onClick={toggleDrawer}>
             <ChevronLeftIcon />
           </IconButton>
-          <IconButton onClick={()=>logout()}>
+          <IconButton onClick={handleLogout}>
             <LogoutIcon />
           </IconButton>
         </Toolbar>
