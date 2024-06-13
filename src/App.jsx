@@ -1,6 +1,6 @@
 import * as React from 'react';
 import SignUp from './pages/SignUp';
-import SingIn from './pages/SignIn';
+import SignIn from './pages/SignIn';
 import Dashboard from './pages/Dashboard';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import useAuth from './hooks/useAuth';
@@ -8,8 +8,7 @@ import useAuth from './hooks/useAuth';
 function RequireAuth({ children }) {
   const { authed } = useAuth();
   const location = useLocation();
-
-  return authed === true ? (
+  return authed == true ? (
     children
   ) : (
     <Navigate to="/signin" replace state={{ path: location.pathname }} />
@@ -17,10 +16,9 @@ function RequireAuth({ children }) {
 }
 
 export default function App() {
-  React.useEffect(() => {});
   return (
     <Routes>
-      <Route path="/signin" element={<SingIn />} />
+      <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
       <Route
         path="/dashboard"

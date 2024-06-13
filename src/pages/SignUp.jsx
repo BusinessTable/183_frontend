@@ -12,25 +12,28 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { register } from '../functions/passwordHandler';
+import { register as PH_register } from '../functions/passwordHandler';
 import useAuth from '../hooks/useAuth';
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-  const navigate = useNavigate();
   const { authed, login } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(()=>{
+    if(authed){
+      navigate("/dashboard")
+    }
+  },[authed])
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    await register(data.get('userName'), data.get('masterPassword'))
+    await PH_register(data.get('userName'), data.get('masterPassword'))
       .then((response) => {
-        console.log(response.data);
-        login(JSON.stringify(response.data)).then(() => {
-          console.log(!!authed)
-        });
+        login(response.data)
       })
       .catch((error) => {
         console.log(error);

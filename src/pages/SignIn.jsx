@@ -1,19 +1,43 @@
-import * as React from "react";
-import { Avatar, Button, CssBaseline, TextField, Grid, Box, Typography, Container } from "@mui/material";
-import { Link } from "react-router-dom";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import * as React from 'react';
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Grid,
+  Box,
+  Typography,
+  Container,
+} from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { login as PH_login} from '../functions/passwordHandler';
+import useAuth from '../hooks/useAuth';
 
 const defaultTheme = createTheme();
 
-export default function SingIn() {
-  const handleSubmit = (event) => {
+export default function SignIn() {
+  const { authed, login } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(()=>{
+    if(authed){
+      navigate("/dashboard")
+    }
+  },[authed])
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get("email"),
-      masterPassword: data.get("password"),
-    });
+
+    await PH_login(data.get('userName'), data.get('masterPassword'))
+      .then((response) => {
+        login(response.data)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (

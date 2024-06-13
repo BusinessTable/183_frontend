@@ -9,9 +9,6 @@ import TableRow from "@mui/material/TableRow";
 
 export default function Orders() {
   let rows = [];
-  React.useEffect(() => {
-    
-  }, []);
 
   return (
     <React.Fragment>
