@@ -44,7 +44,7 @@ export async function getPasswords(token) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    data: JSON.stringify({ username: Cookies.get("MP").split(":")[1] }),
+    data: { username: Cookies.get("MP").split(":")[1] },
   };
 
   let passwords = await axios.request(config);
