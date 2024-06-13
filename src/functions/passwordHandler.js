@@ -38,7 +38,7 @@ export async function login(username, password) {
 export async function getPasswords(token) {
   console.log(Cookies.get("MP").split(":")[1]);
   let config = {
-    method: "get",
+    method: "post",
     maxBodyLength: Infinity,
     url: url + "/passwords",
     headers: {
@@ -70,12 +70,15 @@ export async function addPassword(token, passwords) {
   let config = {
     method: "post",
     maxBodyLength: Infinity,
-    url: url + "/passwords",
+    url: url + "/passwords/add",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    data: JSON.stringify({ username: Cookies.get("MP").split(":")[1], passwords: passwords }),
+    data: JSON.stringify({
+      username: Cookies.get("MP").split(":")[1],
+      passwords: passwords,
+    }),
   };
 
   return await axios.request(config);
@@ -91,7 +94,10 @@ export async function deletePassword(token, uuid) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    data: JSON.stringify({ username: Cookies.get("MP").split(":")[1], uuid: uuid }),
+    data: JSON.stringify({
+      username: Cookies.get("MP").split(":")[1],
+      uuid: uuid,
+    }),
   };
 
   return await axios.request(config);
