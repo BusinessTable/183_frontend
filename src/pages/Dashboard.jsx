@@ -9,7 +9,10 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import LogoutIcon from "@mui/icons-material/Logout";
 import Orders from "../components/Orders";
+import AddPassword from "../components/AddPassword";
+import useAuth from "../hooks/useAuth";
 
 const drawerWidth = 240;
 
@@ -39,6 +42,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== "open" 
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
+  const { logout } = useAuth();
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -51,12 +55,15 @@ export default function Dashboard() {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",  // Adjust to space-between
             px: [1],
           }}
         >
           <IconButton onClick={toggleDrawer}>
             <ChevronLeftIcon />
+          </IconButton>
+          <IconButton onClick={()=>logout()}>
+            <LogoutIcon />
           </IconButton>
         </Toolbar>
       </Drawer>
@@ -77,6 +84,12 @@ export default function Dashboard() {
             <Grid item xs={12}>
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
                 <Orders />
+              </Paper>
+            </Grid>
+            {/* Add Password */}
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+                <AddPassword />
               </Paper>
             </Grid>
           </Grid>
