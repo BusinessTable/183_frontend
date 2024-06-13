@@ -7,9 +7,9 @@ function useAuth() {
 
   return {
     authed,
-    login() {
+    login(token) {
       return new Promise((res) => {
-        setAuthed(true);
+        setAuthed(token);
         res();
       });
     },
