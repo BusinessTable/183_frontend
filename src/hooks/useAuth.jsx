@@ -18,12 +18,12 @@ function useAuth() {
 
   return {
     authed,
-    login({ token, expiresIn, MP }) {
-      console.log({ token, expiresIn, MP })
+    login({ token, expiresIn, MP, username }) {
+      console.log({ token, expiresIn, MP, username });
       return new Promise((res) => {
         const expires = new Date(expiresIn);
         Cookies.set("token", token, { expires }); // Set the token cookie with expiration date
-        Cookies.set("MP", MP, { expires }); // Set the MP cookie with expiration date
+        Cookies.set("MP", MP+":"+username, { expires }); // Set the MP cookie with expiration date
         setAuthed(token);
         res();
       });
@@ -35,7 +35,7 @@ function useAuth() {
         setAuthed(false);
         res();
       });
-    }
+    },
   };
 }
 

@@ -4,11 +4,19 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import { getPasswords } from "../functions/passwordHandler"
+import useAuth from "../hooks/useAuth"
 
 // Generate Order Data
 
 export default function Orders() {
+  const { authed } = useAuth();
   let rows = [];
+
+  React.useEffect(() => {
+    console.log(authed)
+    getPasswords(authed)
+  }, [authed]);
 
   return (
     <React.Fragment>

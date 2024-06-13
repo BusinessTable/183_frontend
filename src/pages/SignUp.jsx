@@ -1,14 +1,5 @@
 import * as React from "react";
-import {
-  Avatar,
-  Button,
-  CssBaseline,
-  TextField,
-  Grid,
-  Box,
-  Typography,
-  Container,
-} from "@mui/material";
+import { Avatar, Button, CssBaseline, TextField, Grid, Box, Typography, Container } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -39,9 +30,7 @@ export default function SignUp() {
     setPasswordStrength(passwordStrengthResult.score);
 
     if (passwordStrengthResult.score < 3) {
-      setPasswordError(
-        "Password is too weak. Please choose a stronger password."
-      );
+      setPasswordError("Password is too weak. Please choose a stronger password.");
     } else {
       setPasswordError("");
     }
@@ -58,7 +47,7 @@ export default function SignUp() {
     await PH_register(data.get("userName"), data.get("masterPassword"))
       .then((response) => {
         let { token, expiresIn } = response.data;
-        login({ token: token, expiresIn: expiresIn, MP: data.get("masterPassword") });
+        login({ token: token, expiresIn: expiresIn, MP: data.get("masterPassword"), username: data.get("userName") });
       })
       .catch((error) => {
         console.log(error);
@@ -104,13 +93,7 @@ export default function SignUp() {
                 />
               </Grid>
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={passwordStrength < 3}
-            >
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={passwordStrength < 3}>
               Sign Up
             </Button>
             <Grid container justifyContent="flex-end">

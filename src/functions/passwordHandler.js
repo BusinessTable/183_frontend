@@ -35,7 +35,7 @@ export async function login(username, password) {
 }
 
 // get all passwords
-export async function getPasswords(token, username) {
+export async function getPasswords(token) {
   let config = {
     method: "get",
     maxBodyLength: Infinity,
@@ -44,24 +44,24 @@ export async function getPasswords(token, username) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    data: JSON.stringify({ username: username }),
+    data: JSON.stringify({ username: Cookies.get("MP").split(":")[1] }),
   };
 
   let passwords = await axios.request(config);
 
   // decrypt passwords
   passwords = passwords.data.map((password) => {
-    return AES.decrypt(password, Cookies.get("MP")).toString();
+    return AES.decrypt(password, Cookies.get("MP").split(":")[0]);
   });
 
   return passwords;
 }
 
 // add new password
-export async function addPassword(token, username, passwords) {
+export async function addPassword(token, passwords) {
   // encrypt passwords
   passwords = passwords.map((password) => {
-    return AES.encrypt(password, Cookies.get("MP")).toString();
+    return AES.encrypt(password, Cookies.get("MP").split(":")[0]);
   });
 
   console.log(passwords);
@@ -74,14 +74,14 @@ export async function addPassword(token, username, passwords) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    data: JSON.stringify({ username: username, passwords: passwords }),
+    data: JSON.stringify({ username: Cookies.get("MP").split(":")[1], passwords: passwords }),
   };
 
   return await axios.request(config);
 }
 
 // delete password
-export async function deletePassword(token, username, uuid) {
+export async function deletePassword(token, uuid) {
   let config = {
     method: "delete",
     maxBodyLength: Infinity,
@@ -90,14 +90,14 @@ export async function deletePassword(token, username, uuid) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    data: JSON.stringify({ username: username, uuid: uuid }),
+    data: JSON.stringify({ username: Cookies.get("MP").split(":")[1], uuid: uuid }),
   };
 
   return await axios.request(config);
 }
 
 // update password
-export async function updatePassword(token, username, uuid, password) {
+export async function updatePassword(token, uuid, password) {
   // encrypt password
   password = AES.encrypt(password, Cookies.get("MP")).toString();
 
@@ -110,7 +110,7 @@ export async function updatePassword(token, username, uuid, password) {
       Authorization: "Bearer " + token,
     },
     data: JSON.stringify({
-      username: username,
+      username: Cookies.get("MP").split(":")[1],
       uuid: uuid,
       newPassword: password,
     }),

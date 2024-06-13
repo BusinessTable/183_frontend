@@ -1,19 +1,10 @@
-import * as React from 'react';
-import {
-  Avatar,
-  Button,
-  CssBaseline,
-  TextField,
-  Grid,
-  Box,
-  Typography,
-  Container,
-} from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { login as PH_login} from '../functions/passwordHandler';
-import useAuth from '../hooks/useAuth';
+import * as React from "react";
+import { Avatar, Button, CssBaseline, TextField, Grid, Box, Typography, Container } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { login as PH_login } from "../functions/passwordHandler";
+import useAuth from "../hooks/useAuth";
 
 const defaultTheme = createTheme();
 
@@ -21,19 +12,19 @@ export default function SignIn() {
   const { authed, login } = useAuth();
   const navigate = useNavigate();
 
-  React.useEffect(()=>{
-    if(authed){
-      navigate("/dashboard")
+  React.useEffect(() => {
+    if (authed) {
+      navigate("/dashboard");
     }
-  },[authed, navigate])
+  }, [authed, navigate]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    await PH_login(data.get('userName'), data.get('password'))
+    await PH_login(data.get("userName"), data.get("password"))
       .then((response) => {
         let { token, expiresIn } = response.data;
-        login({ token: token, expiresIn: expiresIn, MP: data.get("password") });
+        login({ token: token, expiresIn: expiresIn, MP: data.get("password"), username: data.get("userName") });
       })
       .catch((error) => {
         console.log(error);
