@@ -14,7 +14,6 @@ export default function Orders() {
   let rows = [];
 
   React.useEffect(() => {
-    console.log(authed)
     getPasswords(authed)
   }, [authed]);
 

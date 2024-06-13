@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { TextField, Button, Box } from "@mui/material";
+import { addPassword } from "../functions/passwordHandler";
+import useAuth from "../hooks/useAuth"
 
 export default function AddPassword() {
+  const { authed } = useAuth
   const [passwordData, setPasswordData] = useState({
     username: "",
     pwd: "",
@@ -18,8 +21,9 @@ export default function AddPassword() {
   };
 
   const handleAddPassword = () => {
-    // Add your logic to handle adding a new password here
+    // adding new password
     console.log("New password data:", passwordData);
+    addPassword(authed, passwordData)
     // Clear the input fields
     setPasswordData({
       username: "",

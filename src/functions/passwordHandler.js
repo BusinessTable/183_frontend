@@ -59,13 +59,12 @@ export async function getPasswords(token) {
 }
 
 // add new password
-export async function addPassword(token, passwords) {
+export async function addPassword(token, password) {
   // encrypt passwords
-  passwords = passwords.map((password) => {
-    return AES.encrypt(password, Cookies.get("MP").split(":")[0]);
-  });
+  let [MP, userName] = Cookies.get("MP").split(":")
+  password = AES.encrypt(password, MP);
 
-  console.log(passwords);
+  console.log(password);
 
   let config = {
     method: "post",
@@ -75,10 +74,10 @@ export async function addPassword(token, passwords) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    data: JSON.stringify({
-      username: Cookies.get("MP").split(":")[1],
-      passwords: passwords,
-    }),
+    data: {
+      username: userName,
+      passwords: password,
+    },
   };
 
   return await axios.request(config);
