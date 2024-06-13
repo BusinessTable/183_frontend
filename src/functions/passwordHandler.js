@@ -47,7 +47,14 @@ export async function getPasswords(token, username) {
     data: JSON.stringify({ username: username }),
   };
 
-  return await axios.request(config);
+  let passwords = await axios.request(config);
+
+  // decrypt passwords
+  passwords = passwords.data.map((password) => {
+    return AES.decrypt(password, Cookies.get("MP")).toString();
+  });
+
+  return passwords;
 }
 
 // add new password
