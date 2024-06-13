@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   Avatar,
   Button,
@@ -8,32 +8,56 @@ import {
   Box,
   Typography,
   Container,
-} from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { register as PH_register } from '../functions/passwordHandler';
-import useAuth from '../hooks/useAuth';
+} from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { register as PH_register } from "../functions/passwordHandler";
+import useAuth from "../hooks/useAuth";
+import zxcvbn from "zxcvbn";
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
   const { authed, login } = useAuth();
   const navigate = useNavigate();
+  const [password, setPassword] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState("");
+  const [passwordStrength, setPasswordStrength] = React.useState(0);
 
-  React.useEffect(()=>{
-    if(authed){
-      navigate("/dashboard")
+  React.useEffect(() => {
+    if (authed) {
+      navigate("/dashboard");
     }
-  },[authed, navigate])
+  }, [authed, navigate]);
+
+  const handlePasswordChange = (event) => {
+    const newPassword = event.target.value;
+    setPassword(newPassword);
+
+    const passwordStrengthResult = zxcvbn(newPassword);
+    setPasswordStrength(passwordStrengthResult.score);
+
+    if (passwordStrengthResult.score < 3) {
+      setPasswordError(
+        "Password is too weak. Please choose a stronger password."
+      );
+    } else {
+      setPasswordError("");
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (passwordStrength < 3) {
+      return;
+    }
+
     const data = new FormData(event.currentTarget);
 
-    await PH_register(data.get('userName'), data.get('masterPassword'))
+    await PH_register(data.get("userName"), data.get("masterPassword"))
       .then((response) => {
-        login(response.data)
+        login(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -47,12 +71,12 @@ export default function SignUp() {
         <Box
           sx={{
             marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
@@ -80,10 +104,14 @@ export default function SignUp() {
                   required
                   fullWidth
                   name="masterPassword"
-                  label="masterPassword"
-                  type="masterPassword"
+                  label="Master Password"
+                  type="password"
                   id="masterPassword"
                   autoComplete="new-password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  error={passwordError !== ""}
+                  helperText={passwordError}
                 />
               </Grid>
             </Grid>
@@ -92,6 +120,7 @@ export default function SignUp() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={passwordStrength < 3}
             >
               Sign Up
             </Button>
