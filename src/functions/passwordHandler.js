@@ -36,6 +36,7 @@ export async function login(username, password) {
 
 // get all passwords
 export async function getPasswords(token) {
+  console.log(Cookies.get("MP").split(":")[1]);
   let config = {
     method: "get",
     maxBodyLength: Infinity,
@@ -44,7 +45,7 @@ export async function getPasswords(token) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    data: { username: Cookies.get("MP").split(":")[1] },
+    data: JSON.stringify({ username: Cookies.get("MP").split(":")[1] }),
   };
 
   let passwords = await axios.request(config);
