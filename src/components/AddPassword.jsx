@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { TextField, Button, Box } from '@mui/material';
 import { addPassword } from '../functions/passwordHandler';
 import useAuth from '../hooks/useAuth';
+import { useNavigate } from 'react-router';
 
 export default function AddPassword() {
+  const navigate = useNavigate();
   const { authed } = useAuth();
   const [passwordData, setPasswordData] = useState({
     username: '',
@@ -22,7 +24,7 @@ export default function AddPassword() {
 
   const handleAddPassword = () => {
     // adding new password
-    addPassword(authed, passwordData);
+    addPassword(authed, passwordData).then(() => navigate(0));
     // Clear the input fields
     setPasswordData({
       username: '',
