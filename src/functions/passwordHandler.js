@@ -1,5 +1,6 @@
 import axios from "axios";
-import CryptoJS from "crypto-js";
+import Cookies from "js-cookie";
+var AES = require("crypto-js/aes");
 
 let url = "http://localhost:5005";
 
@@ -51,6 +52,13 @@ export async function getPasswords(token, username) {
 
 // add new password
 export async function addPassword(token, username, passwords) {
+  // encrypt passwords
+  passwords = passwords.map((password) => {
+    return AES.encrypt(password, Cookies.get("MP")).toString();
+  });
+
+  console.log(passwords);
+
   let config = {
     method: "post",
     maxBodyLength: Infinity,
