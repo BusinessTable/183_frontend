@@ -34,7 +34,7 @@ export async function login(username, password) {
 }
 
 // get all passwords
-export async function getPasswords(token) {
+export async function getPasswords(token, username) {
   let config = {
     method: "get",
     maxBodyLength: Infinity,
@@ -43,20 +43,14 @@ export async function getPasswords(token) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
+    data: JSON.stringify({ username: username }),
   };
 
-  return await axios
-    .request(config)
-    .then((response) => {
-      return JSON.stringify(response.data);
-    })
-    .catch((error) => {
-      return error;
-    });
+  return await axios.request(config);
 }
 
 // add new password
-export async function addPassword(token, username, password) {
+export async function addPassword(token, username, passwords) {
   let config = {
     method: "post",
     maxBodyLength: Infinity,
@@ -65,17 +59,10 @@ export async function addPassword(token, username, password) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    data: JSON.stringify({ username: username, password: password }),
+    data: JSON.stringify({ username: username, passwords: passwords }),
   };
 
-  return await axios
-    .request(config)
-    .then((response) => {
-      return JSON.stringify(response.data);
-    })
-    .catch((error) => {
-      return error;
-    });
+  return await axios.request(config);
 }
 
 // delete password
@@ -91,14 +78,7 @@ export async function deletePassword(token, username, uuid) {
     data: JSON.stringify({ username: username, uuid: uuid }),
   };
 
-  return await axios
-    .request(config)
-    .then((response) => {
-      return JSON.stringify(response.data);
-    })
-    .catch((error) => {
-      return error;
-    });
+  return await axios.request(config);
 }
 
 // update password
@@ -118,12 +98,5 @@ export async function updatePassword(token, username, uuid, password) {
     }),
   };
 
-  return await axios
-    .request(config)
-    .then((response) => {
-      return JSON.stringify(response.data);
-    })
-    .catch((error) => {
-      return error;
-    });
+  return await axios.request(config);
 }
