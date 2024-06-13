@@ -8,7 +8,7 @@ import useAuth from './hooks/useAuth';
 function RequireAuth({ children }) {
   const { authed } = useAuth();
   const location = useLocation();
-  return authed == true ? (
+  return !!authed ? (
     children
   ) : (
     <Navigate to="/signin" replace state={{ path: location.pathname }} />

@@ -25,7 +25,7 @@ export default function SignUp() {
     if(authed){
       navigate("/dashboard")
     }
-  },[authed])
+  },[authed, navigate])
 
   const handleSubmit = async (event) => {
     event.preventDefault();
