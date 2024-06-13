@@ -98,6 +98,9 @@ export async function deletePassword(token, username, uuid) {
 
 // update password
 export async function updatePassword(token, username, uuid, password) {
+  // encrypt password
+  password = AES.encrypt(password, Cookies.get("MP")).toString();
+
   let config = {
     method: "put",
     maxBodyLength: Infinity,
