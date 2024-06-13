@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from "@mui/icons-material/Logout";
-import Orders from "../components/Orders";
+import Table from "../components/Table";
 import AddPassword from "../components/AddPassword"; // Import the new AddPassword component
 import useAuth from "../hooks/useAuth";
 
@@ -83,7 +83,7 @@ export default function Dashboard() {
             {/* Recent Orders */}
             <Grid item xs={12}>
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                <Orders />
+                <Table />
               </Paper>
             </Grid>
             {/* Add Password */}

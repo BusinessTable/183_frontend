@@ -4,17 +4,17 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { getPasswords } from "../functions/passwordHandler"
-import useAuth from "../hooks/useAuth"
+import { getPasswords } from "../functions/passwordHandler";
+import useAuth from "../hooks/useAuth";
 
 // Generate Order Data
 
-export default function Orders() {
+export default function Tables() {
   const { authed } = useAuth();
   let rows = [];
 
   React.useEffect(() => {
-    getPasswords(authed)
+    getPasswords(authed).then((x) => console.log(x));
   }, [authed]);
 
   return (

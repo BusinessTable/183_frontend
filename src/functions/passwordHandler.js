@@ -37,7 +37,6 @@ export async function login(username, password) {
 
 // get all passwords
 export async function getPasswords(token) {
-  console.log(Cookies.get("MP").split(":")[1]);
   let config = {
     method: "post",
     maxBodyLength: Infinity,
@@ -52,8 +51,10 @@ export async function getPasswords(token) {
   let passwords = await axios.request(config);
 
   // Decrypt
-  var bytes = CryptoJS.AES.decrypt(passwords, "");
-  var originalText = bytes.toString(CryptoJS.enc.Utf8);
+  let originalText = []
+  passwords.data.forEach(password => {
+    originalText.push(CryptoJS.AES.decrypt(password.data, Cookies.get("MP").split(":")[0]).toString(CryptoJS.enc.Utf8));
+  });
 
   return originalText;
 }
