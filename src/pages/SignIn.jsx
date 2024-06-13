@@ -30,8 +30,7 @@ export default function SignIn() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-
-    await PH_login(data.get('userName'), data.get('masterPassword'))
+    await PH_login(data.get('userName'), data.get('password'))
       .then((response) => {
         login(response.data)
       })
@@ -61,7 +60,7 @@ export default function SignIn() {
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <TextField required fullWidth id="email" label="Email Address" name="email" autoComplete="email" />
+                <TextField required fullWidth id="userName" label="User Name" name="userName" autoComplete="email" />
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -71,7 +70,7 @@ export default function SignIn() {
                   label="Password"
                   type="password"
                   id="password"
-                  autoComplete="new-password"
+                  autoComplete="password"
                 />
               </Grid>
             </Grid>

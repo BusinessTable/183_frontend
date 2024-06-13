@@ -28,12 +28,5 @@ export async function login(username, password) {
     data: JSON.stringify({ username: username, masterPassword: password }),
   };
 
-  return await axios
-    .request(config)
-    .then((response) => {
-      return JSON.stringify(response.data);
-    })
-    .catch((error) => {
-      return error;
-    });
+  return await axios.request(config);
 }
