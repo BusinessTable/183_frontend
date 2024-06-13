@@ -12,7 +12,7 @@ function useAuth() {
     // Check if the token cookie exists when the component mounts
     const token = Cookies.get("token");
     if (token) {
-      setAuthed(true);
+      setAuthed(token);
     }
   }, []);
 
