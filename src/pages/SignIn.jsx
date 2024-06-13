@@ -32,7 +32,8 @@ export default function SignIn() {
     const data = new FormData(event.currentTarget);
     await PH_login(data.get('userName'), data.get('password'))
       .then((response) => {
-        login(response.data)
+        let { token, expiresIn } = response.data;
+        login({ token: token, expiresIn: expiresIn, MP: data.get("password") });
       })
       .catch((error) => {
         console.log(error);

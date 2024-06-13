@@ -57,7 +57,8 @@ export default function SignUp() {
 
     await PH_register(data.get("userName"), data.get("masterPassword"))
       .then((response) => {
-        login(response.data);
+        let { token, expiresIn } = response.data;
+        login({ token: token, expiresIn: expiresIn, MP: data.get("masterPassword") });
       })
       .catch((error) => {
         console.log(error);
@@ -82,22 +83,10 @@ export default function SignUp() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 3 }}
-          >
+          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="userName"
-                  label="User Name"
-                  name="userName"
-                  autoComplete="username"
-                />
+                <TextField required fullWidth id="userName" label="User Name" name="userName" autoComplete="username" />
               </Grid>
               <Grid item xs={12}>
                 <TextField
