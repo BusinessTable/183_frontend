@@ -24,7 +24,7 @@ export default function AddPassword() {
 
   const handleAddPassword = () => {
     // adding new password
-    addPassword(authed, passwordData).then(() => navigate(0));
+    addPassword(authed, passwordData).finally(() => navigate(0));
     // Clear the input fields
     setPasswordData({
       username: '',
