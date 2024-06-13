@@ -1,6 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 var AES = require("crypto-js/aes");
+var CryptoJS = require("crypto-js");
 
 let url = "http://localhost:5005";
 
@@ -50,21 +51,24 @@ export async function getPasswords(token) {
 
   let passwords = await axios.request(config);
 
-  // decrypt passwords
-  passwords = passwords.data.map((password) => {
-    return AES.decrypt(password, Cookies.get("MP").split(":")[0]);
-  });
+  // Decrypt
+  var bytes = CryptoJS.AES.decrypt(passwords, "");
+  var originalText = bytes.toString(CryptoJS.enc.Utf8);
 
-  return passwords;
+  return originalText;
 }
 
 // add new password
 export async function addPassword(token, password) {
-  // encrypt passwords
-  let [MP, userName] = Cookies.get("MP").split(":")
-  password = AES.encrypt(password, MP);
+  // Encrypt
+  var ciphertext = CryptoJS.AES.encrypt(
+    password.toString(),
+    Cookies.get("MP").split(":")[0].toString()
+  ).toString();
 
-  console.log(password);
+  let username = Cookies.get("MP").split(":")[1];
+
+  console.log(ciphertext);
 
   let config = {
     method: "post",
@@ -75,8 +79,8 @@ export async function addPassword(token, password) {
       Authorization: "Bearer " + token,
     },
     data: {
-      username: userName,
-      passwords: password,
+      username: username,
+      passwords: ciphertext,
     },
   };
 
