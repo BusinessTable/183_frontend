@@ -76,7 +76,7 @@ export async function addPassword(token, password) {
     url: url + "/passwords/add",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer " + Cookies.get("token"),
+      Authorization: "Bearer " + token,
     },
     data: {
       username: username,

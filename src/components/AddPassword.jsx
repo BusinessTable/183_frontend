@@ -4,7 +4,7 @@ import { addPassword } from "../functions/passwordHandler";
 import useAuth from "../hooks/useAuth"
 
 export default function AddPassword() {
-  const { authed } = useAuth
+  const { authed } = useAuth();
   const [passwordData, setPasswordData] = useState({
     username: "",
     pwd: "",
