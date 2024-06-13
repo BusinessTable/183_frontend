@@ -1,20 +1,21 @@
-import * as React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import { getPasswords } from "../functions/passwordHandler";
-import useAuth from "../hooks/useAuth";
-
-// Generate Order Data
+import * as React from 'react';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import { getPasswords } from '../functions/passwordHandler';
+import useAuth from '../hooks/useAuth';
 
 export default function Tables() {
   const { authed } = useAuth();
-  let rows = [];
+  const [rows, setRows] = React.useState([]);
 
   React.useEffect(() => {
-    getPasswords(authed).then((x) => console.log(x));
+    getPasswords(authed)
+      .then((x) => {
+        setRows(x);
+      })
   }, [authed]);
 
   return (
@@ -29,7 +30,7 @@ export default function Tables() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.forEach((row, idx) => (
+          {rows.map((row, idx) => (
             <TableRow key={idx}>
               <TableCell>{row.username}</TableCell>
               <TableCell>{row.pwd}</TableCell>

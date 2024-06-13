@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import { TextField, Button, Box } from "@mui/material";
-import { addPassword } from "../functions/passwordHandler";
-import useAuth from "../hooks/useAuth"
+import React, { useState } from 'react';
+import { TextField, Button, Box } from '@mui/material';
+import { addPassword } from '../functions/passwordHandler';
+import useAuth from '../hooks/useAuth';
 
 export default function AddPassword() {
   const { authed } = useAuth();
   const [passwordData, setPasswordData] = useState({
-    username: "",
-    pwd: "",
-    url: "",
-    notes: "",
+    username: '',
+    pwd: '',
+    url: '',
+    notes: '',
   });
 
   const handleChange = (e) => {
@@ -22,19 +22,18 @@ export default function AddPassword() {
 
   const handleAddPassword = () => {
     // adding new password
-    console.log("New password data:", passwordData);
-    addPassword(authed, passwordData)
+    addPassword(authed, passwordData);
     // Clear the input fields
     setPasswordData({
-      username: "",
-      pwd: "",
-      url: "",
-      notes: "",
+      username: '',
+      pwd: '',
+      url: '',
+      notes: '',
     });
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <TextField
         label="Username"
         variant="outlined"
