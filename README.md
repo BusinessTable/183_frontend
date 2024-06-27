@@ -25,3 +25,17 @@ sobald wir keine probleme, mit dem backend haben, fählt praktisch nur noch die 
 ## Reflexion 06.06.2024
 
 Wir konnten die Fehler des Backends lösen. Jetzt fehlt nur noch, die Endpoints zu verbinden.
+
+## Reflexion 27.06.2024
+
+Heute hatten wir ein wenig Probleme mit dem Paging, konnten dies aber lösen. Dazu haben wir uns Gedanken gemacht wie wir unser Projekt weiter führen werden.
+
+Beziehungsweise, haben wir uns Gedanken gemacht arüber, was wir noch umsetzen müssen oder besser gesagt noch wollen.
+
+Bei unserem jetzigen Fortschritt haben wir grundsätzlich gute Voraussetzungen um unser Frontend weiter auszubauen.
+
+Wir haben, da unser momentaner Code fehler wirft diesen noch nicht commitet, falls jemand unser Projekt klonen möchte.
+
+Diese Probleme werden wir nächste Woche lösen.
+
+Wir sind trotzdem sehr Stolz auf unseren momentan Fortschritt und sind sehr zuversichtlich.
