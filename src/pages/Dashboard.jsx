@@ -56,7 +56,7 @@ export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
 
   const handleChange = (event, value) => {
-    setPage(value)
+    setPage(value);
   };
 
   React.useEffect(() => {

@@ -22,7 +22,7 @@ function useAuth() {
       return new Promise((res) => {
         const expires = new Date(expiresIn);
         Cookies.set("token", token, { expires }); // Set the token cookie with expiration date
-        Cookies.set("MP", MP+":"+username, { expires }); // Set the MP cookie with expiration date
+        Cookies.set("MP", MP + ":" + username, { expires }); // Set the MP cookie with expiration date
         setAuthed(token);
         res();
       });

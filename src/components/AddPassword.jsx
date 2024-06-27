@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
-import { addPassword } from '../functions/passwordHandler';
-import useAuth from '../hooks/useAuth';
-import { useNavigate } from 'react-router';
+import React, { useState } from "react";
+import { TextField, Button, Box } from "@mui/material";
+import { addPassword } from "../functions/passwordHandler";
+import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router";
 
 export default function AddPassword() {
   const navigate = useNavigate();
   const { authed } = useAuth();
   const [passwordData, setPasswordData] = useState({
-    username: '',
-    pwd: '',
-    url: '',
-    notes: '',
+    username: "",
+    pwd: "",
+    url: "",
+    notes: "",
   });
 
   const handleChange = (e) => {
@@ -27,15 +27,15 @@ export default function AddPassword() {
     addPassword(authed, passwordData).finally(() => navigate(0));
     // Clear the input fields
     setPasswordData({
-      username: '',
-      pwd: '',
-      url: '',
-      notes: '',
+      username: "",
+      pwd: "",
+      url: "",
+      notes: "",
     });
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <TextField
         label="Username"
         variant="outlined"
@@ -53,14 +53,7 @@ export default function AddPassword() {
         onChange={handleChange}
         fullWidth
       />
-      <TextField
-        label="URL"
-        variant="outlined"
-        name="url"
-        value={passwordData.url}
-        onChange={handleChange}
-        fullWidth
-      />
+      <TextField label="URL" variant="outlined" name="url" value={passwordData.url} onChange={handleChange} fullWidth />
       <TextField
         label="Notes"
         variant="outlined"
