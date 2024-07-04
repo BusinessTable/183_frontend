@@ -35,8 +35,8 @@ export async function login(username, password) {
   return await axios.request(config);
 }
 
-// get all passwords
-export async function getPasswords(token, page) {
+// get a Page of passwords
+export async function getPasswordsPage(token, page) {
   let config = {
     method: "post",
     maxBodyLength: Infinity,
@@ -53,12 +53,44 @@ export async function getPasswords(token, page) {
   // Decrypt
   let originalText = [];
   passwords.data.passwords.forEach((password) => {
-    originalText.push(
-      JSON.parse(CryptoJS.AES.decrypt(password.data, Cookies.get("MP").split(":")[0]).toString(CryptoJS.enc.Utf8))
-    );
+    originalText.push({
+      password: JSON.parse(
+        CryptoJS.AES.decrypt(password.data, Cookies.get("MP").split(":")[0]).toString(CryptoJS.enc.Utf8)
+      ),
+      uuid: password.uuid,
+    });
   });
   return { totalPages: passwords.data.totalPages, passwords: originalText };
 }
+
+// get all passwords
+export async function getAllPasswords(token) {
+  let config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: url + "/passwords",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+    data: JSON.stringify({ username: Cookies.get("MP").split(":")[1], page: 0 }),
+  };
+
+  let passwords = await axios.request(config);
+
+  // Decrypt
+  let originalText = [];
+  passwords.data.forEach((password) => {
+    originalText.push({
+      password: JSON.parse(
+        CryptoJS.AES.decrypt(password.data, Cookies.get("MP").split(":")[0]).toString(CryptoJS.enc.Utf8)
+      ),
+      uuid: password.uuid,
+    });
+  });
+  return originalText;
+}
+
 
 // add new password
 export async function addPassword(token, password) {
@@ -69,8 +101,6 @@ export async function addPassword(token, password) {
   ).toString();
 
   let username = Cookies.get("MP").split(":")[1];
-
-  console.log(ciphertext);
 
   let config = {
     method: "post",
@@ -86,7 +116,8 @@ export async function addPassword(token, password) {
     },
   };
 
-  return await axios.request(config);
+  const response = await axios.request(config);
+  return response.data;
 }
 
 // delete password

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
@@ -10,15 +10,19 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from "@mui/icons-material/Logout";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import Pagination from "@mui/material/Pagination";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import { getPasswords } from "../functions/passwordHandler";
-import AddPassword from "../components/AddPassword";
+import { getPasswordsPage, deletePassword, updatePassword, addPassword } from "../functions/passwordHandler";
+import AddPasswordDialog from "../components/AddPasswordDialog";
 import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router";
 
 const drawerWidth = 240;
 
@@ -50,42 +54,81 @@ const Drawer = styled(MuiDrawer, {
 
 export default function Dashboard() {
   const { logout, authed } = useAuth();
-  const [rows, setRows] = React.useState([]);
-  const [pageNumbers, setPageNumbers] = React.useState(1);
-  const [page, setPage] = React.useState(1);
-  const [open, setOpen] = React.useState(true);
+  const [rows, setRows] = useState([]);
+  const [pageNumbers, setPageNumbers] = useState(1);
+  const [page, setPage] = useState(1);
+  const [openDrawer, setOpenDrawer] = useState(true);
+  const [editPassword, setEditPassword] = useState(null); // State for editing password
+  const [refreshFlag, setRefreshFlag] = useState(false); // State to trigger data refresh
+  const [openAddDialog, setOpenAddDialog] = useState(false); // State for opening Add Password dialog
+  const navigate = useNavigate();
 
-  const handleChange = (event, value) => {
+  useEffect(() => {
+    fetchPasswords();
+  }, [authed, page, refreshFlag]); // Trigger fetch on authed, page, or refreshFlag change
+
+  const fetchPasswords = () => {
+    getPasswordsPage(authed, page).then((data) => {
+      setRows(data.passwords);
+      setPageNumbers(data.totalPages);
+    });
+  };
+
+  const handlePageChange = (event, value) => {
     setPage(value);
   };
 
-  React.useEffect(() => {
-    getPasswords(authed, page).then((x) => {
-      setRows(x.passwords);
-      setPageNumbers(x.totalPages);
-    });
-  }, [authed, page]);
-
   const toggleDrawer = () => {
-    setOpen(!open);
+    setOpenDrawer(!openDrawer);
+  };
+
+  const handleDelete = async (uuid) => {
+    await deletePassword(authed, uuid);
+    setRefreshFlag((prevFlag) => !prevFlag);
+  };
+
+  const handleEdit = (password) => {
+    setEditPassword(password);
+    setOpenAddDialog(true); // Open dialog for editing
+  };
+
+  const handleUpdatePassword = async (updatedPasswordData) => {
+    try {
+      await updatePassword(authed, editPassword.uuid, updatedPasswordData);
+      setEditPassword(null); // Clear edit mode
+      setRefreshFlag((prevFlag) => !prevFlag); // Refresh password list
+      setOpenAddDialog(false); // Close dialog after updating
+    } catch (error) {
+      console.error("Error updating password:", error);
+    }
+  };
+
+  const handleAddPassword = async (newPasswordData) => {
+    try {
+      await addPassword(authed, newPasswordData);
+      setRefreshFlag((prevFlag) => !prevFlag); // Refresh password list
+      setOpenAddDialog(false); // Close dialog after adding
+    } catch (error) {
+      console.error("Error adding password:", error);
+    }
   };
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <Drawer variant="permanent" open={open}>
+      <Drawer variant="permanent" open={openDrawer}>
         <Toolbar
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between", // Adjust to space-between
+            justifyContent: "space-between",
             px: [1],
           }}
         >
           <IconButton onClick={toggleDrawer}>
             <ChevronLeftIcon />
           </IconButton>
-          <IconButton onClick={() => logout()}>
+          <IconButton onClick={logout}>
             <LogoutIcon />
           </IconButton>
         </Toolbar>
@@ -103,41 +146,55 @@ export default function Dashboard() {
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           <Grid container spacing={3} style={{ display: "flex", flexDirection: "row-reverse" }}>
-            {/* Recent Orders */}
             <Grid item xs={12}>
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>username</TableCell>
-                      <TableCell>pwd</TableCell>
-                      <TableCell>url</TableCell>
-                      <TableCell>notes</TableCell>
+                      <TableCell>Username</TableCell>
+                      <TableCell>Password</TableCell>
+                      <TableCell>URL</TableCell>
+                      <TableCell>Notes</TableCell>
+                      <TableCell>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {rows.map((row, idx) => (
                       <TableRow key={idx}>
-                        <TableCell>{row.username}</TableCell>
-                        <TableCell>{row.pwd}</TableCell>
-                        <TableCell>{row.url}</TableCell>
-                        <TableCell>{row.notes}</TableCell>
+                        <TableCell>{row.password.username}</TableCell>
+                        <TableCell>{row.password.pwd}</TableCell>
+                        <TableCell>{row.password.url}</TableCell>
+                        <TableCell>{row.password.notes}</TableCell>
+                        <TableCell>
+                          <IconButton onClick={() => handleEdit(row)}>
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton onClick={() => handleDelete(row.uuid)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </Paper>
             </Grid>
-            <Pagination count={pageNumbers} page={page} size="small" onChange={handleChange} />
-            {/* Add Password */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                <AddPassword />
-              </Paper>
-            </Grid>
+            <Pagination count={pageNumbers} page={page} size="small" onChange={handlePageChange} />
           </Grid>
         </Container>
       </Box>
+      <Paper sx={{ position: "absolute", bottom: "20px", right: "20px" }}>
+        <IconButton onClick={() => setOpenAddDialog(true)} color="primary" aria-label="add password">
+          <AddIcon fontSize="large"/>
+        </IconButton>
+      </Paper>
+      <AddPasswordDialog
+        open={openAddDialog}
+        onClose={() => setOpenAddDialog(false)}
+        onAddPassword={handleAddPassword}
+        editPassword={editPassword}
+        onUpdatePassword={handleUpdatePassword}
+      />
     </Box>
   );
 }
