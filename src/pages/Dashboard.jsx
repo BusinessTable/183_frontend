@@ -92,25 +92,17 @@ export default function Dashboard() {
     setOpenAddDialog(true); // Open dialog for editing
   };
 
-  const handleUpdatePassword = async (updatedPasswordData) => {
-    try {
-      await updatePassword(authed, editPassword.uuid, updatedPasswordData);
-      setEditPassword(null); // Clear edit mode
-      setRefreshFlag((prevFlag) => !prevFlag); // Refresh password list
-      setOpenAddDialog(false); // Close dialog after updating
-    } catch (error) {
-      console.error("Error updating password:", error);
-    }
+  const handleUpdatePassword = (updatedPasswordData) => {
+    updatePassword(authed, editPassword.uuid, updatedPasswordData);
+    setEditPassword(null); // Clear edit mode
+    setRefreshFlag((prevFlag) => !prevFlag); // Refresh password list
+    setOpenAddDialog(false); // Close dialog after updating
   };
 
-  const handleAddPassword = async (newPasswordData) => {
-    try {
-      await addPassword(authed, newPasswordData);
-      setRefreshFlag((prevFlag) => !prevFlag); // Refresh password list
-      setOpenAddDialog(false); // Close dialog after adding
-    } catch (error) {
-      console.error("Error adding password:", error);
-    }
+  const handleAddPassword = (newPasswordData) => {
+    addPassword(authed, newPasswordData);
+    setRefreshFlag((prevFlag) => !prevFlag); // Refresh password list
+    setOpenAddDialog(false); // Close dialog after adding
   };
 
   return (
@@ -185,12 +177,15 @@ export default function Dashboard() {
       </Box>
       <Paper sx={{ position: "absolute", bottom: "20px", right: "20px" }}>
         <IconButton onClick={() => setOpenAddDialog(true)} color="primary" aria-label="add password">
-          <AddIcon fontSize="large"/>
+          <AddIcon fontSize="large" />
         </IconButton>
       </Paper>
       <AddPasswordDialog
         open={openAddDialog}
-        onClose={() => setOpenAddDialog(false)}
+        onClose={() => {
+          setOpenAddDialog(false);
+          setEditPassword(null);
+        }}
         onAddPassword={handleAddPassword}
         editPassword={editPassword}
         onUpdatePassword={handleUpdatePassword}

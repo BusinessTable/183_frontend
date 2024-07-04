@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  OutlinedInput,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
+import { VisibilityOff, Visibility} from "@mui/icons-material";
 
 export default function AddPasswordDialog({ open, onClose, onAddPassword, editPassword, onUpdatePassword }) {
   const initialPasswordData = {
@@ -10,6 +21,7 @@ export default function AddPasswordDialog({ open, onClose, onAddPassword, editPa
   };
 
   const [passwordData, setPasswordData] = useState(initialPasswordData);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (editPassword) {
@@ -23,6 +35,10 @@ export default function AddPasswordDialog({ open, onClose, onAddPassword, editPa
       setPasswordData(initialPasswordData);
     }
   }, [editPassword]);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => event.preventDefault();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +62,7 @@ export default function AddPasswordDialog({ open, onClose, onAddPassword, editPa
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{editPassword ? "Edit Password" : "Add Password"}</DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ gap: "10px", display: "flex", flexDirection: "column", width: "50vw" }}>
         <TextField
           label="Username"
           variant="outlined"
@@ -55,14 +71,26 @@ export default function AddPasswordDialog({ open, onClose, onAddPassword, editPa
           onChange={handleChange}
           fullWidth
         />
-        <TextField
+        <OutlinedInput
           label="Password"
           variant="outlined"
           name="pwd"
-          type="password"
+          type={showPassword ? "text" : "password"}
           value={passwordData.pwd}
           onChange={handleChange}
           fullWidth
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          }
         />
         <TextField
           label="URL"
