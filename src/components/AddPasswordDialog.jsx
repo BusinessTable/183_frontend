@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -9,15 +9,23 @@ import {
   OutlinedInput,
   IconButton,
   InputAdornment,
-} from "@mui/material";
-import { VisibilityOff, Visibility } from "@mui/icons-material";
+  FormControl,
+  InputLabel,
+} from '@mui/material';
+import { VisibilityOff, Visibility } from '@mui/icons-material';
 
-export default function AddPasswordDialog({ open, onClose, onAddPassword, editPassword, onUpdatePassword }) {
+export default function AddPasswordDialog({
+  open,
+  onClose,
+  onAddPassword,
+  editPassword,
+  onUpdatePassword,
+}) {
   const initialPasswordData = {
-    username: "",
-    pwd: "",
-    url: "",
-    notes: "",
+    username: '',
+    pwd: '',
+    url: '',
+    notes: '',
   };
 
   const [passwordData, setPasswordData] = useState(initialPasswordData);
@@ -61,8 +69,18 @@ export default function AddPasswordDialog({ open, onClose, onAddPassword, editPa
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{editPassword ? "Edit Password" : "Add Password"}</DialogTitle>
-      <DialogContent sx={{ gap: "10px", display: "flex", flexDirection: "column", width: "50vw", maxWidth: "600px" }}>
+      <DialogTitle>
+        {editPassword ? 'Edit Password' : 'Add Password'}
+      </DialogTitle>
+      <DialogContent
+        sx={{
+          gap: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          width: '50vw',
+          maxWidth: '600px',
+        }}
+      >
         <TextField
           label="Username"
           variant="outlined"
@@ -71,27 +89,31 @@ export default function AddPasswordDialog({ open, onClose, onAddPassword, editPa
           onChange={handleChange}
           fullWidth
         />
-        <OutlinedInput
-          label="Password"
-          variant="outlined"
-          name="pwd"
-          type={showPassword ? "text" : "password"}
-          value={passwordData.pwd}
-          onChange={handleChange}
-          fullWidth
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-                edge="end"
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          }
-        />
+        <FormControl variant="outlined">
+          <InputLabel htmlFor="outlined-adornment-password">
+            Password
+          </InputLabel>
+          <OutlinedInput
+            name="pwd"
+            value={passwordData.pwd}
+            onChange={handleChange}
+            fullWidth
+            type={showPassword ? 'text' : 'password'}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            label="Password"
+          />
+        </FormControl>
         <TextField
           label="URL"
           variant="outlined"
@@ -112,8 +134,12 @@ export default function AddPasswordDialog({ open, onClose, onAddPassword, editPa
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleAddOrUpdatePassword} color="primary" variant="contained">
-          {editPassword ? "Update Password" : "Add Password"}
+        <Button
+          onClick={handleAddOrUpdatePassword}
+          color="primary"
+          variant="contained"
+        >
+          {editPassword ? 'Update Password' : 'Add Password'}
         </Button>
         <Button onClick={onClose} color="secondary" variant="outlined">
           Cancel

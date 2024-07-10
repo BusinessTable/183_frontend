@@ -1,6 +1,5 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-var AES = require('crypto-js/aes');
 var CryptoJS = require('crypto-js');
 
 let url = 'http://localhost:5005';
