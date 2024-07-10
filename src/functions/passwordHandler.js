@@ -1,317 +1,156 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-var CryptoJS = require('crypto-js');
+import CryptoJS from 'crypto-js';
 
-let url = 'http://localhost:5005';
+const baseURL = 'http://localhost:5005';
+const config = {
+  maxBodyLength: Infinity,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+};
 
-// register as new user
-export async function register(username, password) {
-  let config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: url + '/register',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: JSON.stringify({ username: username, masterPassword: password }),
-  };
+const getAuthConfig = (token) => ({
+  ...config,
+  headers: {
+    ...config.headers,
+    Authorization: `Bearer ${token}`,
+  },
+});
 
-  return await axios.request(config);
-}
+const getUserData = () => {
+  const [encryptionKey, username] = Cookies.get('MP').split(':');
+  return { encryptionKey, username };
+};
 
-// login function
-export async function login(username, password) {
-  let config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: url + '/login',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: JSON.stringify({ username: username, masterPassword: password }),
-  };
+const encryptPassword = (password, key) => {
+  return CryptoJS.AES.encrypt(JSON.stringify(password), key).toString();
+};
 
-  return await axios.request(config);
-}
+const decryptPassword = (password, key) => {
+  return JSON.parse(
+    CryptoJS.AES.decrypt(password, key).toString(CryptoJS.enc.Utf8)
+  );
+};
 
-// get a Page of passwords
-export async function getPasswordsPage(token, page) {
-  let config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: url + '/passwords',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + token,
-    },
-    data: JSON.stringify({
-      username: Cookies.get('MP').split(':')[1],
-      page: page,
-    }),
-  };
+const prepareData = (data) => JSON.stringify(data);
 
-  let passwords = await axios.request(config);
+export const register = async (username, password) => {
+  return await axios.post(`${baseURL}/register`, prepareData({ username, masterPassword: password }), config);
+};
 
-  // Decrypt
-  let originalText = [];
-  passwords.data.passwords.forEach((password) => {
-    originalText.push({
-      password: JSON.parse(
-        CryptoJS.AES.decrypt(
-          password.data,
-          Cookies.get('MP').split(':')[0]
-        ).toString(CryptoJS.enc.Utf8)
-      ),
-      uuid: password.uuid,
-    });
-  });
-  return { totalPages: passwords.data.totalPages, passwords: originalText };
-}
+export const login = async (username, password) => {
+  return await axios.post(`${baseURL}/login`, prepareData({ username, masterPassword: password }), config);
+};
 
-// get all passwords
-export async function getAllPasswords(token) {
-  let config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: url + '/passwords',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + token,
-    },
-    data: JSON.stringify({
-      username: Cookies.get('MP').split(':')[1],
-      page: 0,
-    }),
-  };
+export const getPasswordsPage = async (token, page) => {
+  const { encryptionKey, username } = getUserData();
+  const response = await axios.post(`${baseURL}/passwords`, prepareData({ username, page }), getAuthConfig(token));
+  const passwords = response.data.passwords.map((password) => ({
+    password: decryptPassword(password.data, encryptionKey),
+    uuid: password.uuid,
+  }));
+  return { totalPages: response.data.totalPages, passwords };
+};
 
-  let passwords = await axios.request(config);
+export const getAllPasswords = async (token) => {
+  const { encryptionKey, username } = getUserData();
+  const response = await axios.post(`${baseURL}/passwords`, prepareData({ username, page: 0 }), getAuthConfig(token));
+  return response.data.map((password) => ({
+    password: decryptPassword(password.data, encryptionKey),
+    uuid: password.uuid,
+  }));
+};
 
-  // Decrypt
-  let originalText = [];
-  passwords.data.forEach((password) => {
-    originalText.push({
-      password: JSON.parse(
-        CryptoJS.AES.decrypt(
-          password.data,
-          Cookies.get('MP').split(':')[0]
-        ).toString(CryptoJS.enc.Utf8)
-      ),
-      uuid: password.uuid,
-    });
-  });
-  return originalText;
-}
-
-// add new password
-export async function addPassword(token, password) {
-  // Encrypt
-  var ciphertext = CryptoJS.AES.encrypt(
-    JSON.stringify(password),
-    Cookies.get('MP').split(':')[0].toString()
-  ).toString();
-
-  let username = Cookies.get('MP').split(':')[1];
-
-  let config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: url + '/passwords/add',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + token,
-    },
-    data: {
-      username: username,
-      passwords: ciphertext,
-    },
-  };
-
-  const response = await axios.request(config);
+export const addPassword = async (token, password) => {
+  const { encryptionKey, username } = getUserData();
+  const encryptedPassword = encryptPassword(password, encryptionKey);
+  const response = await axios.post(`${baseURL}/passwords/add`, { username, passwords: encryptedPassword }, getAuthConfig(token));
   return response.data;
-}
+};
 
-// delete password
-export async function deletePassword(token, uuid) {
-  let config = {
-    method: 'delete',
-    maxBodyLength: Infinity,
-    url: url + '/passwords',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + token,
-    },
-    data: JSON.stringify({
-      username: Cookies.get('MP').split(':')[1],
-      uuid: uuid,
-    }),
-  };
+export const deletePassword = async (token, uuid) => {
+  const { username } = getUserData();
+  return await axios.delete(`${baseURL}/passwords`, {
+    ...getAuthConfig(token),
+    data: prepareData({ username, uuid }),
+  });
+};
 
-  return await axios.request(config);
-}
+export const updatePassword = async (token, uuid, password) => {
+  const { encryptionKey, username } = getUserData();
+  const encryptedPassword = encryptPassword(password, encryptionKey);
+  return await axios.put(`${baseURL}/passwords`, prepareData({ username, uuid, newPassword: encryptedPassword }), getAuthConfig(token));
+};
 
-// update password
-export async function updatePassword(token, uuid, password) {
-  // encrypt password
-  password = CryptoJS.AES.encrypt(
-    JSON.stringify(password),
-    Cookies.get('MP').split(':')[0].toString()
-  ).toString();
-
-  let config = {
-    method: 'put',
-    maxBodyLength: Infinity,
-    url: url + '/passwords',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + token,
-    },
-    data: JSON.stringify({
-      username: Cookies.get('MP').split(':')[1],
-      uuid: uuid,
-      newPassword: password,
-    }),
-  };
-
-  return await axios.request(config);
-}
-
-// Function to fetch rubriks for a user
-export async function getRubriks(token) {
+export const getRubriks = async (token) => {
+  const { username } = getUserData();
   try {
-    const response = await axios.post(
-      url + '/rubriken',
-      { username: getUsernameFromToken(token) },
-      {
-        headers: {
-          Authorization: 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post(`${baseURL}/rubriken`, prepareData({ username }), getAuthConfig(token));
     return response.data;
   } catch (error) {
     console.error('Error fetching rubriks:', error);
     throw error;
   }
-}
+};
 
-// Function to create a new rubrik
-export async function createRubrik(token, rubrik) {
+export const createRubrik = async (token, rubrik) => {
+  const { username } = getUserData();
   try {
-    const response = await axios.post(
-      url + '/rubriken/create',
-      {
-        username: getUsernameFromToken(token),
-        rubrik: rubrik,
-      },
-      {
-        headers: {
-          Authorization: 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post(`${baseURL}/rubriken/create`, prepareData({ username, rubrik }), getAuthConfig(token));
     return response.data;
   } catch (error) {
     console.error('Error creating rubrik:', error);
     throw error;
   }
-}
+};
 
-// Function to delete a rubrik
-export async function deleteRubrik(token, uuid) {
+export const deleteRubrik = async (token, uuid) => {
+  const { username } = getUserData();
   try {
-    const response = await axios.delete(url + '/rubriken', {
-      headers: {
-        Authorization: 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-      data: {
-        username: getUsernameFromToken(token),
-        uuid: uuid,
-      },
+    const response = await axios.delete(`${baseURL}/rubriken`, {
+      ...getAuthConfig(token),
+      data: prepareData({ username, uuid }),
     });
     return response.data;
   } catch (error) {
     console.error('Error deleting rubrik:', error);
     throw error;
   }
-}
+};
 
-// Function to update a rubrik
-export async function updateRubrik(token, uuid, newRubrik) {
+export const updateRubrik = async (token, uuid, newRubrik) => {
+  const { username } = getUserData();
   try {
-    const response = await axios.put(
-      url + '/rubriken',
-      {
-        username: getUsernameFromToken(token),
-        uuid: uuid,
-        newRubrik: newRubrik,
-      },
-      {
-        headers: {
-          Authorization: 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.put(`${baseURL}/rubriken`, prepareData({ username, uuid, newRubrik }), getAuthConfig(token));
     return response.data;
   } catch (error) {
     console.error('Error updating rubrik:', error);
     throw error;
   }
-}
+};
 
-// Function to add a password to a rubrik
-export async function addPasswordToRubrik(token, rubrikUUID, passwordUUID) {
+export const addPasswordToRubrik = async (token, rubrikUUID, passwordUUID) => {
+  const { username } = getUserData();
   try {
-    const response = await axios.post(
-      url + '/rubriken/passwords',
-      {
-        username: getUsernameFromToken(token),
-        uuid: rubrikUUID,
-        passwordUUID: passwordUUID,
-      },
-      {
-        headers: {
-          Authorization: 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post(`${baseURL}/rubriken/passwords`, prepareData({ username, uuid: rubrikUUID, passwordUUID }), getAuthConfig(token));
     return response.data;
   } catch (error) {
     console.error('Error adding password to rubrik:', error);
     throw error;
   }
-}
+};
 
-// Function to remove a password from a rubrik
-export async function removePasswordFromRubrik(
-  token,
-  rubrikUUID,
-  passwordUUID
-) {
+export const removePasswordFromRubrik = async (token, rubrikUUID, passwordUUID) => {
+  const { username } = getUserData();
   try {
-    const response = await axios.delete(url + '/rubriken/passwords', {
-      headers: {
-        Authorization: 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
-      data: {
-        username: getUsernameFromToken(token),
-        uuid: rubrikUUID,
-        passwordUUID: passwordUUID,
-      },
+    const response = await axios.delete(`${baseURL}/rubriken/passwords`, {
+      ...getAuthConfig(token),
+      data: prepareData({ username, uuid: rubrikUUID, passwordUUID }),
     });
     return response.data;
   } catch (error) {
     console.error('Error removing password from rubrik:', error);
     throw error;
   }
-}
-
-// Utility function to extract username from token
-function getUsernameFromToken(token) {
-  return Cookies.get('MP').split(':')[1]; // Replace with your cookie handling logic
-}
+};
