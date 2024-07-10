@@ -10,7 +10,7 @@ import {
   IconButton,
   InputAdornment,
 } from "@mui/material";
-import { VisibilityOff, Visibility} from "@mui/icons-material";
+import { VisibilityOff, Visibility } from "@mui/icons-material";
 
 export default function AddPasswordDialog({ open, onClose, onAddPassword, editPassword, onUpdatePassword }) {
   const initialPasswordData = {
@@ -62,7 +62,7 @@ export default function AddPasswordDialog({ open, onClose, onAddPassword, editPa
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{editPassword ? "Edit Password" : "Add Password"}</DialogTitle>
-      <DialogContent sx={{ gap: "10px", display: "flex", flexDirection: "column", width: "50vw" }}>
+      <DialogContent sx={{ gap: "10px", display: "flex", flexDirection: "column", width: "50vw", maxWidth: "600px" }}>
         <TextField
           label="Username"
           variant="outlined"

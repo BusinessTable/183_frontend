@@ -1,28 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from "@mui/icons-material/Logout";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import Pagination from "@mui/material/Pagination";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import { getPasswordsPage, deletePassword, updatePassword, addPassword } from "../functions/passwordHandler";
+import {
+  CssBaseline,
+  Box,
+  Toolbar,
+  IconButton,
+  Container,
+  Grid,
+  Paper,
+  Pagination,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Button,
+} from "@mui/material";
+import {
+  getPasswordsPage,
+  deletePassword,
+  updatePassword,
+  addPassword,
+  getRubriks,
+  createRubrik,
+  deleteRubrik,
+  updateRubrik,
+  addPasswordToRubrik,
+  removePasswordFromRubrik,
+} from "../functions/passwordHandler"; // Adjust imports as per your file structure
 import AddPasswordDialog from "../components/AddPasswordDialog";
+import AddRubricDialog from "../components/AddRubricDialog";
 import useAuth from "../hooks/useAuth";
-import { useNavigate } from "react-router";
 
 const drawerWidth = 240;
 
@@ -61,16 +80,24 @@ export default function Dashboard() {
   const [editPassword, setEditPassword] = useState(null); // State for editing password
   const [refreshFlag, setRefreshFlag] = useState(false); // State to trigger data refresh
   const [openAddDialog, setOpenAddDialog] = useState(false); // State for opening Add Password dialog
-  const navigate = useNavigate();
+  const [rubrics, setRubrics] = useState([]); // State to store rubrics
+  const [openAddRubricDialog, setOpenAddRubricDialog] = useState(false); // State for opening Add Rubric dialog
 
   useEffect(() => {
     fetchPasswords();
+    fetchRubrics();
   }, [authed, page, refreshFlag]); // Trigger fetch on authed, page, or refreshFlag change
 
   const fetchPasswords = () => {
     getPasswordsPage(authed, page).then((data) => {
       setRows(data.passwords);
       setPageNumbers(data.totalPages);
+    });
+  };
+
+  const fetchRubrics = () => {
+    getRubriks(authed).then((data) => {
+      setRubrics(data);
     });
   };
 
@@ -82,12 +109,12 @@ export default function Dashboard() {
     setOpenDrawer(!openDrawer);
   };
 
-  const handleDelete = async (uuid) => {
+  const handleDeletePassword = async (uuid) => {
     await deletePassword(authed, uuid);
     setRefreshFlag((prevFlag) => !prevFlag);
   };
 
-  const handleEdit = (password) => {
+  const handleEditPassword = (password) => {
     setEditPassword(password);
     setOpenAddDialog(true); // Open dialog for editing
   };
@@ -103,6 +130,36 @@ export default function Dashboard() {
     addPassword(authed, newPasswordData);
     setRefreshFlag((prevFlag) => !prevFlag); // Refresh password list
     setOpenAddDialog(false); // Close dialog after adding
+  };
+
+  const handleDeleteRubric = async (uuid) => {
+    await deleteRubrik(authed, uuid);
+    setRefreshFlag((prevFlag) => !prevFlag); // Refresh rubrics list
+  };
+
+  const handleEditRubric = (rubric) => {
+    // Implement if needed
+  };
+
+  const handleUpdateRubric = (uuid, newRubrik) => {
+    updateRubrik(authed, uuid, newRubrik);
+    setRefreshFlag((prevFlag) => !prevFlag); // Refresh rubrics list
+  };
+
+  const handleAddRubric = (rubrik) => {
+    createRubrik(authed, rubrik);
+    setRefreshFlag((prevFlag) => !prevFlag); // Refresh rubrics list
+    setOpenAddRubricDialog(false); // Close dialog after adding
+  };
+
+  const handleAddPasswordToRubric = (rubricUUID, passwordUUID) => {
+    addPasswordToRubrik(authed, rubricUUID, passwordUUID);
+    setRefreshFlag((prevFlag) => !prevFlag); // Refresh rubrics list
+  };
+
+  const handleRemovePasswordFromRubric = (rubricUUID, passwordUUID) => {
+    removePasswordFromRubrik(authed, rubricUUID, passwordUUID);
+    setRefreshFlag((prevFlag) => !prevFlag); // Refresh rubrics list
   };
 
   return (
@@ -158,10 +215,10 @@ export default function Dashboard() {
                         <TableCell>{row.password.url}</TableCell>
                         <TableCell>{row.password.notes}</TableCell>
                         <TableCell>
-                          <IconButton onClick={() => handleEdit(row)}>
+                          <IconButton onClick={() => handleEditPassword(row)}>
                             <EditIcon />
                           </IconButton>
-                          <IconButton onClick={() => handleDelete(row.uuid)}>
+                          <IconButton onClick={() => handleDeletePassword(row.uuid)}>
                             <DeleteIcon />
                           </IconButton>
                         </TableCell>
@@ -172,6 +229,33 @@ export default function Dashboard() {
               </Paper>
             </Grid>
             <Pagination count={pageNumbers} page={page} size="small" onChange={handlePageChange} />
+          </Grid>
+        </Container>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+                <Typography variant="h6">Rubrics</Typography>
+                <List>
+                  {rubrics.map((rubric) => (
+                    <ListItem key={rubric.uuid}>
+                      <ListItemText primary={rubric.name} />
+                      <ListItemSecondaryAction>
+                        <IconButton onClick={() => handleEditRubric(rubric)}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton onClick={() => handleDeleteRubric(rubric.uuid)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+                </List>
+                <Button variant="contained" color="primary" onClick={() => setOpenAddRubricDialog(true)}>
+                  Add Rubric
+                </Button>
+              </Paper>
+            </Grid>
           </Grid>
         </Container>
       </Box>
@@ -189,6 +273,11 @@ export default function Dashboard() {
         onAddPassword={handleAddPassword}
         editPassword={editPassword}
         onUpdatePassword={handleUpdatePassword}
+      />
+      <AddRubricDialog
+        open={openAddRubricDialog}
+        onClose={() => setOpenAddRubricDialog(false)}
+        onAddRubric={handleAddRubric}
       />
     </Box>
   );

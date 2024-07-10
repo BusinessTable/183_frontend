@@ -161,3 +161,124 @@ export async function updatePassword(token, uuid, password) {
 
   return await axios.request(config);
 }
+
+// Function to fetch rubriks for a user
+export async function getRubriks(token) {
+  try {
+    const response = await axios.post(url + "/rubriken", { username: getUsernameFromToken(token) }, {
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching rubriks:", error);
+    throw error;
+  }
+}
+
+// Function to create a new rubrik
+export async function createRubrik(token, rubrik) {
+  try {
+    const response = await axios.post(url + "/rubriken/create", {
+      username: getUsernameFromToken(token),
+      rubrik: rubrik,
+    }, {
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating rubrik:", error);
+    throw error;
+  }
+}
+
+// Function to delete a rubrik
+export async function deleteRubrik(token, uuid) {
+  try {
+    const response = await axios.delete(url + "/rubriken", {
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      data: {
+        username: getUsernameFromToken(token),
+        uuid: uuid,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting rubrik:", error);
+    throw error;
+  }
+}
+
+// Function to update a rubrik
+export async function updateRubrik(token, uuid, newRubrik) {
+  try {
+    const response = await axios.put(url + "/rubriken", {
+      username: getUsernameFromToken(token),
+      uuid: uuid,
+      newRubrik: newRubrik,
+    }, {
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating rubrik:", error);
+    throw error;
+  }
+}
+
+// Function to add a password to a rubrik
+export async function addPasswordToRubrik(token, rubrikUUID, passwordUUID) {
+  try {
+    const response = await axios.post(url + "/rubriken/passwords", {
+      username: getUsernameFromToken(token),
+      uuid: rubrikUUID,
+      passwordUUID: passwordUUID,
+    }, {
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error adding password to rubrik:", error);
+    throw error;
+  }
+}
+
+// Function to remove a password from a rubrik
+export async function removePasswordFromRubrik(token, rubrikUUID, passwordUUID) {
+  try {
+    const response = await axios.delete(url + "/rubriken/passwords", {
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      data: {
+        username: getUsernameFromToken(token),
+        uuid: rubrikUUID,
+        passwordUUID: passwordUUID,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error removing password from rubrik:", error);
+    throw error;
+  }
+}
+
+// Utility function to extract username from token
+function getUsernameFromToken(token) {
+  return Cookies.get("MP").split(":")[1]; // Replace with your cookie handling logic
+}
