@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -8,12 +8,27 @@ import {
   TextField,
 } from "@mui/material";
 
-export default function AddRubricDialog({ open, onClose, onAddRubric, editRubric, onUpdateRubric }) {
+export default function RubricDialog({
+  open,
+  onClose,
+  onAddRubric,
+  editRubric,
+  onUpdateRubric,
+  onDeleteRubric,
+}) {
   const initialRubricData = {
     name: "",
   };
 
   const [rubricData, setRubricData] = useState(initialRubricData);
+
+  useEffect(() => {
+    if (editRubric) {
+      setRubricData({ ...editRubric });
+    } else {
+      setRubricData(initialRubricData);
+    }
+  }, [editRubric]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,6 +45,11 @@ export default function AddRubricDialog({ open, onClose, onAddRubric, editRubric
       onAddRubric(rubricData);
     }
     setRubricData(initialRubricData);
+    onClose();
+  };
+
+  const handleDelete = () => {
+    onDeleteRubric(editRubric.uuid);
     onClose();
   };
 
@@ -50,6 +70,11 @@ export default function AddRubricDialog({ open, onClose, onAddRubric, editRubric
         <Button onClick={handleAddOrUpdateRubric} color="primary" variant="contained">
           {editRubric ? "Update Rubric" : "Add Rubric"}
         </Button>
+        {editRubric && (
+          <Button onClick={handleDelete} color="error" variant="outlined">
+            Delete
+          </Button>
+        )}
         <Button onClick={onClose} color="secondary" variant="outlined">
           Cancel
         </Button>

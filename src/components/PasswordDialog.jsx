@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 
-export default function AddPasswordDialog({
+export default function PasswordDialog({
   open,
   onClose,
   onAddPassword,

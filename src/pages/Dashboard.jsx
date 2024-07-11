@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { CssBaseline, Box, Toolbar, Container, Grid } from "@mui/material";
-import DrawerComponent from "../components/DrawerComponent";
-import PasswordTable from "../components/PasswordTable";
-import PaginationComponent from "../components/PaginationComponent";
-import RubricsList from "../components/RubricsList";
-import AddButtons from "../components/AddButtons";
-import AddPasswordDialog from "../components/AddPasswordDialog";
-import AddRubricDialog from "../components/AddRubricDialog";
+import React, { useState, useEffect } from 'react';
+import { CssBaseline, Box, Toolbar, Container, Grid } from '@mui/material';
+import DrawerComponent from '../components/DrawerComponent';
+import PasswordTable from '../components/PasswordTable';
+import PaginationComponent from '../components/PaginationComponent';
+import AddButtons from '../components/AddButtons';
+import AddPasswordDialog from '../components/PasswordDialog';
+import RubricDialog from '../components/RubricDialog';
+import RubricDropdown from '../components/RubricDropdown';
 import {
   getPasswordsPage,
   deletePassword,
@@ -16,8 +16,8 @@ import {
   createRubrik,
   deleteRubrik,
   updateRubrik,
-} from "../functions/passwordHandler";
-import useAuth from "../hooks/useAuth";
+} from '../functions/passwordHandler';
+import useAuth from '../hooks/useAuth';
 
 export default function Dashboard() {
   const { authed } = useAuth();
@@ -29,7 +29,8 @@ export default function Dashboard() {
   const [refreshFlag, setRefreshFlag] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [rubrics, setRubrics] = useState([]);
-  const [openAddRubricDialog, setOpenAddRubricDialog] = useState(false);
+  const [openRubricDialog, setOpenRubricDialog] = useState(false);
+  const [editRubric, setEditRubric] = useState(null);
 
   useEffect(() => {
     fetchPasswords();
@@ -83,40 +84,64 @@ export default function Dashboard() {
   const handleDeleteRubric = async (uuid) => {
     await deleteRubrik(authed, uuid);
     setRefreshFlag((prevFlag) => !prevFlag);
+    setOpenRubricDialog(false);
   };
 
   const handleEditRubric = (rubric) => {
-    // Implement if needed
+    setEditRubric(rubric);
+    setOpenRubricDialog(true);
   };
 
   const handleUpdateRubric = (uuid, newRubrik) => {
     updateRubrik(authed, uuid, newRubrik);
     setRefreshFlag((prevFlag) => !prevFlag);
+    setOpenRubricDialog(false);
   };
 
-  const handleAddRubric = (rubrik) => {
+  const handleAddRubric = () => {
+    setOpenRubricDialog(true);
+  };
+
+  const handleCreateRubric = (rubrik) => {
     createRubrik(authed, rubrik);
     setRefreshFlag((prevFlag) => !prevFlag);
-    setOpenAddRubricDialog(false);
+    setOpenRubricDialog(false);
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <DrawerComponent open={openDrawer} toggleDrawer={toggleDrawer} />
       <Box
         component="main"
         sx={{
           backgroundColor: (theme) =>
-            theme.palette.mode === "light" ? theme.palette.grey[100] : theme.palette.grey[900],
+            theme.palette.mode === 'light'
+              ? theme.palette.grey[100]
+              : theme.palette.grey[900],
           flexGrow: 1,
-          height: "100vh",
-          overflow: "auto",
+          height: '100vh',
+          overflow: 'auto',
         }}
       >
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Grid container spacing={3} style={{ display: "flex", flexDirection: "row-reverse" }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <RubricDropdown
+                rubrics={rubrics}
+                handleEditRubric={handleEditRubric}
+                handleAddRubric={handleAddRubric}
+              />
+            </Grid>
+          </Grid>
+        </Container>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Grid
+            container
+            spacing={3}
+            style={{ display: 'flex', flexDirection: 'row-reverse' }}
+          >
             <Grid item xs={12}>
               <PasswordTable
                 rows={rows}
@@ -131,20 +156,11 @@ export default function Dashboard() {
             />
           </Grid>
         </Container>
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <RubricsList
-                rubrics={rubrics}
-                handleEditRubric={handleEditRubric}
-                handleDeleteRubric={handleDeleteRubric}
-                setOpenAddRubricDialog={setOpenAddRubricDialog}
-              />
-            </Grid>
-          </Grid>
-        </Container>
       </Box>
-      <AddButtons setOpenAddDialog={setOpenAddDialog} />
+      <AddButtons
+        onClick={() => setOpenAddDialog(true)}
+        sx={{ position: 'absolute', bottom: '20px', right: '20px' }}
+      />
       <AddPasswordDialog
         open={openAddDialog}
         onClose={() => {
@@ -155,10 +171,13 @@ export default function Dashboard() {
         editPassword={editPassword}
         onUpdatePassword={handleUpdatePassword}
       />
-      <AddRubricDialog
-        open={openAddRubricDialog}
-        onClose={() => setOpenAddRubricDialog(false)}
-        onAddRubric={handleAddRubric}
+      <RubricDialog
+        open={openRubricDialog}
+        onClose={() => setOpenRubricDialog(false)}
+        onAddRubric={handleCreateRubric}
+        editRubric={editRubric}
+        onUpdateRubric={handleUpdateRubric}
+        onDeleteRubric={handleDeleteRubric}
       />
     </Box>
   );

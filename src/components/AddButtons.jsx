@@ -2,10 +2,10 @@ import React from "react";
 import { Paper, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-export default function AddButtons({ setOpenAddDialog }) {
+export default function AddButtons({ onClick, sx }) {
   return (
-    <Paper sx={{ position: "absolute", bottom: "20px", right: "20px" }}>
-      <IconButton onClick={() => setOpenAddDialog(true)} color="primary" aria-label="add password">
+    <Paper sx={sx}>
+      <IconButton onClick={onClick} color="primary" aria-label="add">
         <AddIcon fontSize="large" />
       </IconButton>
     </Paper>
