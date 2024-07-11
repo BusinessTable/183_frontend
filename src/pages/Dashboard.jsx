@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { CssBaseline, Box, Toolbar, Container, Grid } from '@mui/material';
-import DrawerComponent from '../components/DrawerComponent';
-import PasswordTable from '../components/PasswordTable';
-import PaginationComponent from '../components/PaginationComponent';
-import AddButtons from '../components/AddButtons';
-import PasswordDialog from '../components/PasswordDialog'; // Updated import
-import RubricDialog from '../components/RubricDialog';
-import RubricDropdown from '../components/RubricDropdown';
+import React, { useState, useEffect } from "react";
+import { CssBaseline, Box, Toolbar, Container, Grid } from "@mui/material";
+import DrawerComponent from "../components/DrawerComponent";
+import PasswordTable from "../components/PasswordTable";
+import PaginationComponent from "../components/PaginationComponent";
+import AddButtons from "../components/AddButtons";
+import PasswordDialog from "../components/PasswordDialog"; // Updated import
+import RubricDialog from "../components/RubricDialog";
+import RubricDropdown from "../components/RubricDropdown";
 import {
   getPasswordsPage,
   deletePassword,
@@ -17,8 +17,8 @@ import {
   deleteRubrik,
   updateRubrik,
   addPasswordToRubrik, // Ensure this function is imported
-} from '../functions/passwordHandler';
-import useAuth from '../hooks/useAuth';
+} from "../functions/passwordHandler";
+import useAuth from "../hooks/useAuth";
 
 export default function Dashboard() {
   const { authed } = useAuth();
@@ -112,45 +112,33 @@ export default function Dashboard() {
   };
 
   const handleAddPasswordToRubrik = async (rubricUUID) => {
-    if (editPassword) {
-      await addPasswordToRubrik(authed, rubricUUID, editPassword.uuid);
-    }
+    await addPasswordToRubrik(authed, rubricUUID, editPassword.uuid);
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <DrawerComponent open={openDrawer} toggleDrawer={toggleDrawer} />
       <Box
         component="main"
         sx={{
           backgroundColor: (theme) =>
-            theme.palette.mode === 'light'
-              ? theme.palette.grey[100]
-              : theme.palette.grey[900],
+            theme.palette.mode === "light" ? theme.palette.grey[100] : theme.palette.grey[900],
           flexGrow: 1,
-          height: '100vh',
-          overflow: 'auto',
+          height: "100vh",
+          overflow: "auto",
         }}
       >
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <RubricDropdown
-                rubrics={rubrics}
-                handleEditRubric={handleEditRubric}
-                handleAddRubric={handleAddRubric}
-              />
+              <RubricDropdown rubrics={rubrics} handleEditRubric={handleEditRubric} handleAddRubric={handleAddRubric} />
             </Grid>
           </Grid>
         </Container>
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Grid
-            container
-            spacing={3}
-            style={{ display: 'flex', flexDirection: 'row-reverse' }}
-          >
+          <Grid container spacing={3} style={{ display: "flex", flexDirection: "row-reverse" }}>
             <Grid item xs={12}>
               <PasswordTable
                 rows={rows}
@@ -158,18 +146,11 @@ export default function Dashboard() {
                 handleDeletePassword={handleDeletePassword}
               />
             </Grid>
-            <PaginationComponent
-              pageNumbers={pageNumbers}
-              page={page}
-              handlePageChange={handlePageChange}
-            />
+            <PaginationComponent pageNumbers={pageNumbers} page={page} handlePageChange={handlePageChange} />
           </Grid>
         </Container>
       </Box>
-      <AddButtons
-        onClick={() => setOpenAddDialog(true)}
-        sx={{ position: 'absolute', bottom: '20px', right: '20px' }}
-      />
+      <AddButtons onClick={() => setOpenAddDialog(true)} sx={{ position: "absolute", bottom: "20px", right: "20px" }} />
       <PasswordDialog
         open={openAddDialog}
         onClose={() => {
