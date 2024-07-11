@@ -16,7 +16,8 @@ import {
   createRubrik,
   deleteRubrik,
   updateRubrik,
-  addPasswordToRubrik, // Ensure this function is imported
+  addPasswordToRubrik,
+  removePasswordFromRubrik,
 } from "../functions/passwordHandler";
 import useAuth from "../hooks/useAuth";
 
@@ -32,6 +33,12 @@ export default function Dashboard() {
   const [rubrics, setRubrics] = useState([]);
   const [openRubricDialog, setOpenRubricDialog] = useState(false);
   const [editRubric, setEditRubric] = useState(null);
+  const [selectedRubrik, setSelectedRubrik] = useState(null);
+
+  useEffect(() => {
+    fetchPasswords();
+    fetchRubrics();
+  }, [authed, page, refreshFlag, selectedRubrik]);
 
   useEffect(() => {
     fetchPasswords();
@@ -40,7 +47,16 @@ export default function Dashboard() {
 
   const fetchPasswords = () => {
     getPasswordsPage(authed, page).then((data) => {
-      setRows(data.passwords);
+      let filteredPasswords = data.passwords;
+
+      // Check if a rubric is selected
+      if (selectedRubrik) {
+        filteredPasswords = filteredPasswords.filter(
+          (password) => password.password.rubricUUID === selectedRubrik.uuid
+        );
+      }
+
+      setRows(filteredPasswords);
       setPageNumbers(data.totalPages);
     });
   };
@@ -49,6 +65,24 @@ export default function Dashboard() {
     getRubriks(authed).then((data) => {
       setRubrics(data);
     });
+  };
+
+  const handleUpdatePassword = (passwordId, newRubrikId) => {
+    const password = rows.find((row) => row.id === passwordId);
+    if (password) {
+      setEditPassword(password);
+      if (editPassword) {
+        handleAddPasswordToRubrik(editPassword, newRubrikId);
+      } else {
+        console.error("editPassword is not set");
+      }
+    } else {
+      console.error("Password not found");
+    }
+  };
+
+  const handleRubricSelection = (rubrik) => {
+    setSelectedRubrik(rubrik);
   };
 
   const handlePageChange = (event, value) => {
@@ -67,13 +101,6 @@ export default function Dashboard() {
   const handleEditPassword = (password) => {
     setEditPassword(password);
     setOpenAddDialog(true);
-  };
-
-  const handleUpdatePassword = (updatedPasswordData) => {
-    updatePassword(authed, editPassword.uuid, updatedPasswordData);
-    setEditPassword(null);
-    setRefreshFlag((prevFlag) => !prevFlag);
-    setOpenAddDialog(false);
   };
 
   const handleAddPassword = (newPasswordData) => {
@@ -112,6 +139,16 @@ export default function Dashboard() {
   };
 
   const handleAddPasswordToRubrik = async (rubricUUID) => {
+    if (!rubricUUID) {
+      console.error("UUID is null or undefined");
+      return;
+    }
+
+    if (!editPassword || !editPassword.uuid) {
+      console.error("editPassword or editPassword.uuid is null or undefined");
+      return;
+    }
+
     await addPasswordToRubrik(authed, rubricUUID, editPassword.uuid);
   };
 
@@ -123,7 +160,9 @@ export default function Dashboard() {
         component="main"
         sx={{
           backgroundColor: (theme) =>
-            theme.palette.mode === "light" ? theme.palette.grey[100] : theme.palette.grey[900],
+            theme.palette.mode === "light"
+              ? theme.palette.grey[100]
+              : theme.palette.grey[900],
           flexGrow: 1,
           height: "100vh",
           overflow: "auto",
@@ -133,12 +172,21 @@ export default function Dashboard() {
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <RubricDropdown rubrics={rubrics} handleEditRubric={handleEditRubric} handleAddRubric={handleAddRubric} />
+              <RubricDropdown
+                rubrics={rubrics}
+                handleEditRubric={handleEditRubric}
+                handleAddRubric={handleAddRubric}
+                handleRubricSelection={handleRubricSelection}
+              />
             </Grid>
           </Grid>
         </Container>
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Grid container spacing={3} style={{ display: "flex", flexDirection: "row-reverse" }}>
+          <Grid
+            container
+            spacing={3}
+            style={{ display: "flex", flexDirection: "row-reverse" }}
+          >
             <Grid item xs={12}>
               <PasswordTable
                 rows={rows}
@@ -146,11 +194,18 @@ export default function Dashboard() {
                 handleDeletePassword={handleDeletePassword}
               />
             </Grid>
-            <PaginationComponent pageNumbers={pageNumbers} page={page} handlePageChange={handlePageChange} />
+            <PaginationComponent
+              pageNumbers={pageNumbers}
+              page={page}
+              handlePageChange={handlePageChange}
+            />
           </Grid>
         </Container>
       </Box>
-      <AddButtons onClick={() => setOpenAddDialog(true)} sx={{ position: "absolute", bottom: "20px", right: "20px" }} />
+      <AddButtons
+        onClick={() => setOpenAddDialog(true)}
+        sx={{ position: "absolute", bottom: "20px", right: "20px" }}
+      />
       <PasswordDialog
         open={openAddDialog}
         onClose={() => {
