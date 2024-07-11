@@ -11,6 +11,8 @@ import {
   InputAdornment,
   FormControl,
   InputLabel,
+  MenuItem,
+  Select,
 } from '@mui/material';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 
@@ -20,12 +22,15 @@ export default function PasswordDialog({
   onAddPassword,
   editPassword,
   onUpdatePassword,
+  rubrics, // Array of rubrics to populate the dropdown
+  onAddPasswordToRubrik, // Function to add password to rubric
 }) {
   const initialPasswordData = {
     username: '',
     pwd: '',
     url: '',
     notes: '',
+    rubricUUID: '', // New field to hold the selected rubric UUID
   };
 
   const [passwordData, setPasswordData] = useState(initialPasswordData);
@@ -38,6 +43,7 @@ export default function PasswordDialog({
         pwd: editPassword.password.pwd,
         url: editPassword.password.url,
         notes: editPassword.password.notes,
+        rubricUUID: editPassword.password.rubricUUID || '', // Ensure rubricUUID is initialized
       });
     } else {
       setPasswordData(initialPasswordData);
@@ -67,6 +73,13 @@ export default function PasswordDialog({
     onClose(); // Close dialog
   };
 
+  const handleRubricChange = (e) => {
+    setPasswordData((prevData) => ({
+      ...prevData,
+      rubricUUID: e.target.value,
+    }));
+  };
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>
@@ -89,7 +102,7 @@ export default function PasswordDialog({
           onChange={handleChange}
           fullWidth
         />
-        <FormControl variant="outlined">
+        <FormControl variant="outlined" fullWidth>
           <InputLabel htmlFor="outlined-adornment-password">
             Password
           </InputLabel>
@@ -132,10 +145,29 @@ export default function PasswordDialog({
           multiline
           rows={4}
         />
+        <FormControl variant="outlined" fullWidth>
+          <InputLabel id="rubric-select-label">Rubric</InputLabel>
+          <Select
+            labelId="rubric-select-label"
+            id="rubric-select"
+            value={passwordData.rubricUUID}
+            onChange={handleRubricChange}
+            label="Rubric"
+          >
+            {rubrics.map((rubric) => (
+              <MenuItem key={rubric.uuid} value={rubric.uuid}>
+                {rubric.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={handleAddOrUpdatePassword}
+          onClick={() => {
+            handleAddOrUpdatePassword();
+            onAddPasswordToRubrik(passwordData.rubricUUID); // Call function to add password to rubric
+          }}
           color="primary"
           variant="contained"
         >

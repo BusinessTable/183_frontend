@@ -4,7 +4,7 @@ import DrawerComponent from '../components/DrawerComponent';
 import PasswordTable from '../components/PasswordTable';
 import PaginationComponent from '../components/PaginationComponent';
 import AddButtons from '../components/AddButtons';
-import AddPasswordDialog from '../components/PasswordDialog';
+import PasswordDialog from '../components/PasswordDialog'; // Updated import
 import RubricDialog from '../components/RubricDialog';
 import RubricDropdown from '../components/RubricDropdown';
 import {
@@ -16,6 +16,7 @@ import {
   createRubrik,
   deleteRubrik,
   updateRubrik,
+  addPasswordToRubrik, // Ensure this function is imported
 } from '../functions/passwordHandler';
 import useAuth from '../hooks/useAuth';
 
@@ -84,6 +85,7 @@ export default function Dashboard() {
   const handleDeleteRubric = async (uuid) => {
     await deleteRubrik(authed, uuid);
     setRefreshFlag((prevFlag) => !prevFlag);
+    setEditRubric(null);
     setOpenRubricDialog(false);
   };
 
@@ -95,6 +97,7 @@ export default function Dashboard() {
   const handleUpdateRubric = (uuid, newRubrik) => {
     updateRubrik(authed, uuid, newRubrik);
     setRefreshFlag((prevFlag) => !prevFlag);
+    setEditRubric(null);
     setOpenRubricDialog(false);
   };
 
@@ -106,6 +109,12 @@ export default function Dashboard() {
     createRubrik(authed, rubrik);
     setRefreshFlag((prevFlag) => !prevFlag);
     setOpenRubricDialog(false);
+  };
+
+  const handleAddPasswordToRubrik = async (rubricUUID) => {
+    if (editPassword) {
+      await addPasswordToRubrik(authed, rubricUUID, editPassword.uuid);
+    }
   };
 
   return (
@@ -161,7 +170,7 @@ export default function Dashboard() {
         onClick={() => setOpenAddDialog(true)}
         sx={{ position: 'absolute', bottom: '20px', right: '20px' }}
       />
-      <AddPasswordDialog
+      <PasswordDialog
         open={openAddDialog}
         onClose={() => {
           setOpenAddDialog(false);
@@ -170,10 +179,15 @@ export default function Dashboard() {
         onAddPassword={handleAddPassword}
         editPassword={editPassword}
         onUpdatePassword={handleUpdatePassword}
+        rubrics={rubrics} // Pass rubrics to PasswordDialog
+        onAddPasswordToRubrik={handleAddPasswordToRubrik} // Pass function to associate password with rubric
       />
       <RubricDialog
         open={openRubricDialog}
-        onClose={() => setOpenRubricDialog(false)}
+        onClose={() => {
+          setOpenRubricDialog(false);
+          setEditRubric(null);
+        }}
         onAddRubric={handleCreateRubric}
         editRubric={editRubric}
         onUpdateRubric={handleUpdateRubric}
